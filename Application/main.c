@@ -5,26 +5,18 @@
  *  Author: Khaled Ali
  */ 
 
-#include "../ECUAL/KEYPAD/KEYPAD.h"
+#include "../ECUAL/TEMPERATURE/TEMP_SENSOR.h"
 #include "../ECUAL/LCD/LCD.h"
-#include "../ECUAL/LED/LED.h"
 int main(void){
-	KEYPAD_u8Init();
 	LCD_u8Init();
-	uint8_t key = 0;
-	uint8_t counter = 0;
+	TEMP_t temp_sensor = {PORTA, PIN0, 0};
+	TEMP_u8Init(&temp_sensor);
+	float temp_value;
 	while(1){
-		KEYPAD_u8GetKey(&key);
-		if(key != 0xFF){
-			if(counter == 16){
-				LCD_u8SetCursor(1, 0);
-			}
-			else if(counter == 32){
-				counter = 0;
-				LCD_u8SendCommand(LCD_CLEAR);
-			}
-			LCD_u8SendNumber(key);
-			counter++;
-		}
+		TEMP_u8GetTemp(&temp_sensor, &temp_value);
+		LCD_u8SendString((uint8_t*) "TEMP: ");
+		LCD_u8SendNumber((uint16_t) temp_value);
+		TIMER0_u8PollingDelay(2000);
+		LCD_u8SendCommand(LCD_CLEAR);
 	}
 }
